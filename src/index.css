@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #1a1a1a;
+  --color-foreground: #f2f2f2;
+  --color-muted-foreground: #a3a3a3;
+  --color-panel: #242424;
+  --color-surface: #2b2b2b;
+  --color-border: #3a3a3a;
+  --color-ring: #8a8a8a;
+  --color-primary: #d6d6d6;
+  --color-primary-foreground: #1a1a1a;
+  --color-secondary: #303030;
+  --color-secondary-foreground: #f0f0f0;
+  --color-ghost: transparent;
+  --color-ghost-foreground: #e0e0e0;
+  --font-sans: "Instrument Sans", "Segoe UI", sans-serif;
+  --font-heading: "Sora", "Avenir Next", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    overscroll-behavior: none;
+  }
+
+  html {
+    @apply h-full overflow-hidden bg-background;
+  }
+
+  body {
+    @apply h-full overflow-hidden bg-background font-sans text-foreground antialiased;
+    margin: 0;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  #root {
+    @apply h-full overflow-hidden;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
