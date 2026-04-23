@@ -1,4 +1,4 @@
-import { FolderOpen, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,28 +21,34 @@ export function FileDropzone({
   onUnload,
 }: FileDropzoneProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const lastHandledRequestKeyRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!openRequestKey || disabled) {
+    if (
+      !openRequestKey ||
+      disabled ||
+      lastHandledRequestKeyRef.current === openRequestKey
+    ) {
       return
     }
 
+    lastHandledRequestKeyRef.current = openRequestKey
     inputRef.current?.click()
   }, [disabled, openRequestKey])
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-2">
       <Button
         type="button"
         variant="secondary"
+        size="sm"
         onClick={() => inputRef.current?.click()}
         disabled={disabled}
       >
-        <FolderOpen className="h-4 w-4" />
         {isLoading ? 'Opening...' : 'Browse'}
       </Button>
       {fileName ? (
-        <Button type="button" variant="ghost" onClick={onUnload}>
+        <Button type="button" variant="ghost" size="sm" onClick={onUnload}>
           <X className="h-4 w-4" />
           Unload
         </Button>
@@ -50,7 +56,6 @@ export function FileDropzone({
       <input
         ref={inputRef}
         type="file"
-        accept=".db,.sqlite,.sqlite3"
         className="hidden"
         disabled={disabled}
         onChange={(event) => {

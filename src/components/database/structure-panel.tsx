@@ -7,12 +7,13 @@ import {
   Tags,
   Zap,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { DataTable } from '@/components/database/data-table'
 import { useDbViewer } from '@/context/use-db-viewer'
+import { sqliteClient } from '@/lib/sqlite-client'
 import { cn } from '@/lib/utils'
-import { getDatabaseStructure } from '@/lib/sqlite'
+import type { DatabaseStructure } from '@/lib/sqlite'
 
 function normalizeForSearch(value: string) {
   return value.toLowerCase()
@@ -33,8 +34,11 @@ type StructureRow = {
 const STRUCTURE_COLUMNS = ['Name', 'Type', 'Schema']
 
 export function StructurePanel() {
-  const { database } = useDbViewer()
+  const { databaseRevision, hasDatabase } = useDbViewer()
   const [search, setSearch] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loadedRevision, setLoadedRevision] = useState<number | null>(null)
+  const [structure, setStructure] = useState<DatabaseStructure | null>(null)
   const [expandedGroups, setExpandedGroups] = useState<Record<StructureGroupKey, boolean>>({
     tables: true,
     indexes: true,
@@ -42,13 +46,38 @@ export function StructurePanel() {
     triggers: true,
   })
 
-  const structure = useMemo(() => {
-    if (!database) {
-      return null
+  useEffect(() => {
+    let isActive = true
+
+    if (!hasDatabase) {
+      return () => {
+        isActive = false
+      }
     }
 
-    return getDatabaseStructure(database)
-  }, [database])
+    void sqliteClient
+      .getDatabaseStructure()
+      .then((result) => {
+        if (isActive) {
+          setError(null)
+          setLoadedRevision(databaseRevision)
+          setStructure(result)
+        }
+      })
+      .catch((nextError) => {
+        if (isActive) {
+          setStructure(null)
+          setLoadedRevision(databaseRevision)
+          setError(
+            nextError instanceof Error ? nextError.message : 'Failed to load database structure.',
+          )
+        }
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [databaseRevision, hasDatabase])
 
   const query = normalizeForSearch(search.trim())
   const filteredStructure = useMemo(() => {
@@ -163,7 +192,7 @@ export function StructurePanel() {
     return nextRows
   }, [expandedGroups, filteredStructure])
 
-  if (!structure || !filteredStructure) {
+  if (!hasDatabase) {
     return (
       <div className="flex h-full min-h-0 items-center justify-center text-sm text-muted-foreground">
         Load a SQLite database to inspect its structure.
@@ -171,10 +200,30 @@ export function StructurePanel() {
     )
   }
 
+  if (loadedRevision === databaseRevision && error) {
+    return (
+      <div
+        role="alert"
+        aria-live="assertive"
+        className="flex h-full min-h-0 items-center justify-center text-sm text-muted-foreground"
+      >
+        {error}
+      </div>
+    )
+  }
+
+  if (loadedRevision !== databaseRevision || !structure || !filteredStructure) {
+    return (
+      <div className="flex h-full min-h-0 items-center justify-center text-sm text-muted-foreground">
+        Loading database structure...
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="flex flex-col gap-3 pb-3">
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-2">
           <label className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-panel px-3 py-2 text-xs text-muted-foreground lg:w-80">
             <Search className="h-4 w-4 shrink-0" />
             <input
@@ -184,23 +233,14 @@ export function StructurePanel() {
               placeholder="Search schema objects"
             />
           </label>
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-            <div className="rounded-lg border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
-              Tables: <span className="font-medium text-foreground">{filteredStructure.tables.length}</span>
-            </div>
-            <div className="rounded-lg border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
-              Views: <span className="font-medium text-foreground">{filteredStructure.views.length}</span>
-            </div>
-            <div className="rounded-lg border border-border bg-panel px-3 py-2 text-xs text-muted-foreground">
-              Triggers: <span className="font-medium text-foreground">{filteredStructure.triggers.length}</span>
-            </div>
-          </div>
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden pt-3">
         <DataTable
           className="h-full"
+          fillHeight
+          scrollClassName="h-full max-h-full"
           columns={STRUCTURE_COLUMNS}
           rows={rows.map((row) => [row.name, row.objectType, row.schema])}
           cellClassName={({ column }) =>
@@ -211,20 +251,19 @@ export function StructurePanel() {
           }
           emptyMessage="No schema objects match the current search."
           getRowKey={(_, rowIndex) => rows[rowIndex]?.id ?? `row-${rowIndex}`}
+          rowClassName={(_, rowIndex) =>
+            rows[rowIndex]?.kind === 'group' ? 'cursor-pointer' : undefined
+          }
           onRowClick={(_, rowIndex) => {
             const row = rows[rowIndex]
-            if (!row) {
+            if (row?.kind !== 'group') {
               return
             }
 
-            if (row.kind === 'group') {
-              setExpandedGroups((currentGroups) => ({
-                ...currentGroups,
-                [row.group]: !currentGroups[row.group],
-              }))
-              return
-            }
-
+            setExpandedGroups((currentGroups) => ({
+              ...currentGroups,
+              [row.group]: !currentGroups[row.group],
+            }))
           }}
           renderCell={({ column, rowIndex, value }) => {
             const row = rows[rowIndex]
@@ -272,26 +311,8 @@ export function StructurePanel() {
               return ''
             }
 
-            if (column === 'Type') {
-              return <span className="uppercase tracking-[0.16em]">{String(value)}</span>
-            }
-
-            return <span className="whitespace-nowrap">{String(value)}</span>
+            return value
           }}
-          rowClassName={(_, rowIndex) => {
-            const row = rows[rowIndex]
-            if (!row) {
-              return undefined
-            }
-
-            if (row.kind === 'group') {
-              return 'bg-surface/75 font-medium text-foreground'
-            }
-
-            return 'text-muted-foreground'
-          }}
-          scrollClassName="h-full max-h-full"
-          stripedRows={false}
         />
       </div>
     </div>

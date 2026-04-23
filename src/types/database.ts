@@ -1,7 +1,4 @@
-export type DatabaseEngine = 'sqlite'
-
 export type DbConnectionStatus =
-  | 'idle'
   | 'initializing'
   | 'ready'
   | 'loading'
@@ -10,6 +7,4 @@ export type DbConnectionStatus =
 
 export type DatabaseSummary = {
   fileName: string
-  fileSize: number
-  tableCount: number
 }

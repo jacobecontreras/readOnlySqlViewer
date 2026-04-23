@@ -11,6 +11,17 @@ declare module 'sql.js' {
   export interface Database {
     close(): void
     exec(sql: string, params?: unknown[]): QueryExecResult[]
+    iterateStatements(sql: string): StatementIterator
+  }
+
+  export interface Statement {
+    free(): void
+    getNormalizedSQL(): string
+    getSQL(): string
+  }
+
+  export interface StatementIterator extends Iterable<Statement> {
+    finalize(): void
   }
 
   export default function initSqlJs(config?: {

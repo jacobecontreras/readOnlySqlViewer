@@ -1,10 +1,10 @@
 import { createContext } from 'react'
-import type { Database } from 'sql.js'
 
 import type { DatabaseSummary, DbConnectionStatus } from '@/types/database'
 
 export type DbViewerContextValue = {
-  database: Database | null
+  databaseRevision: number
+  hasDatabase: boolean
   databaseSummary: DatabaseSummary | null
   error: string | null
   status: DbConnectionStatus
@@ -13,7 +13,7 @@ export type DbViewerContextValue = {
   filePickerRequestKey: number
   loadDatabase: (file: File) => Promise<void>
   clearError: () => void
-  unloadDatabase: () => void
+  unloadDatabase: () => Promise<void>
   setSelectedTable: (tableName: string) => void
   requestFilePicker: () => void
 }
