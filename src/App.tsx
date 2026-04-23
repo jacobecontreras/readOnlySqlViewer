@@ -1,13 +1,16 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Info, UploadCloud } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
+import { AboutDialog } from '@/components/about-dialog'
 import { BrowseDataPanel } from '@/components/database/browse-data-panel'
 import { ExecuteSqlPanel } from '@/components/database/execute-sql-panel'
 import { FileDropzone } from '@/components/database/file-dropzone'
 import { StructurePanel } from '@/components/database/structure-panel'
-import { LandingHero } from '@/components/landing-hero'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDbViewer } from '@/context/use-db-viewer'
+
+const ABOUT_HIDDEN_KEY = 'readonlysql:about-hidden'
 
 function isEditableTarget(target: EventTarget | null) {
   return (
@@ -35,6 +38,39 @@ function App() {
   } = useDbViewer()
 
   const isBusy = status === 'initializing' || status === 'loading'
+
+  const [aboutOpen, setAboutOpen] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false)
+
+  useEffect(() => {
+    let hidden = false
+    try {
+      hidden = window.localStorage.getItem(ABOUT_HIDDEN_KEY) === '1'
+    } catch {
+      hidden = false
+    }
+    setDontShowAgain(hidden)
+    if (!hidden) {
+      setAboutOpen(true)
+    }
+  }, [])
+
+  const handleDontShowAgainChange = (value: boolean) => {
+    setDontShowAgain(value)
+    try {
+      if (value) {
+        window.localStorage.setItem(ABOUT_HIDDEN_KEY, '1')
+      } else {
+        window.localStorage.removeItem(ABOUT_HIDDEN_KEY)
+      }
+    } catch {
+      // Ignore storage failures (private mode, quota, etc.).
+    }
+  }
+
+  const handleAboutClose = () => {
+    setAboutOpen(false)
+  }
 
   return (
     <main
@@ -68,6 +104,17 @@ function App() {
                       onFileSelect={loadDatabase}
                       onUnload={() => void unloadDatabase()}
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAboutOpen(true)}
+                      className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
+                      aria-label="About ReadOnlySQL"
+                    >
+                      <Info className="h-4 w-4" aria-hidden="true" />
+                      About
+                    </Button>
                   </div>
                   {hasDatabase ? (
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -133,14 +180,58 @@ function App() {
                     </TabsContent>
                   </>
                 ) : (
-                  <LandingHero disabled={isBusy} onBrowse={requestFilePicker} />
+                  <EmptyState disabled={isBusy} onBrowse={requestFilePicker} />
                 )}
               </div>
             </div>
           </Tabs>
         </section>
       </div>
+
+      <AboutDialog
+        open={aboutOpen}
+        onClose={handleAboutClose}
+        dontShowAgain={dontShowAgain}
+        onDontShowAgainChange={handleDontShowAgainChange}
+      />
     </main>
+  )
+}
+
+type EmptyStateProps = {
+  disabled: boolean
+  onBrowse: () => void
+}
+
+function EmptyState({ disabled, onBrowse }: EmptyStateProps) {
+  return (
+    <div className="flex h-full min-h-0 items-center justify-center">
+      <button
+        type="button"
+        onClick={onBrowse}
+        disabled={disabled}
+        className="group flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-panel/40 px-10 py-12 text-center transition-colors hover:border-foreground/30 hover:bg-panel disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <UploadCloud
+          className="h-8 w-8 text-muted-foreground transition-colors group-hover:text-foreground"
+          aria-hidden="true"
+        />
+        <div className="flex flex-col gap-1">
+          <p className="font-heading text-base font-medium text-foreground">
+            Open a SQLite file
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Drop a <code>.sqlite</code> / <code>.db</code> file, click to browse, or press{' '}
+            <kbd className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px]">
+              ⌘/Ctrl
+            </kbd>{' '}
+            <kbd className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px]">
+              O
+            </kbd>
+          </p>
+        </div>
+      </button>
+    </div>
   )
 }
 

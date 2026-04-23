@@ -56,8 +56,10 @@ The app ships SEO-ready for deployment at `https://readonlysql.com/`:
   (H1, features, how-it-works, FAQ) inside `#root` so AI crawlers that do not
   execute JavaScript (GPTBot, ClaudeBot, PerplexityBot) still see the content.
   `src/main.tsx` strips it before React mounts.
-- `src/components/landing-hero.tsx` — semantic `<h1>`, feature grid,
-  how-it-works, and FAQ rendered for real users when no database is loaded.
+- `src/components/about-dialog.tsx` — feature grid, how-it-works, and FAQ
+  shown to real users in an info modal that auto-opens on first visit and is
+  reachable any time via the in-app **About** button. (SEO is independent of
+  this — crawlers consume the static block in `index.html`.)
 - `public/robots.txt` — allow-list for Google, Bing, and all major AI
   crawlers; points at the sitemap.
 - `public/sitemap.xml` — canonical URL list.
