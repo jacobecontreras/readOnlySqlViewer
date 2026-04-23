@@ -25,16 +25,22 @@
     <meta name="color-scheme" content="dark light" />
 
     <!--
-      Hide the SEO/no-JS fallback inside #root for any browser that runs JS,
-      before the body is even parsed. Crawlers without JS still see the
-      fallback content. Real users never see a flash of it during hydration.
+      Progressive-enhancement pattern for the SEO/no-JS fallback inside #root.
+      JS-capable browsers (real users, Googlebot's renderer): the inline style
+      hides #ssr-fallback before <body> is even parsed, so there is no flash.
+      No-JS clients (GPTBot, ClaudeBot, PerplexityBot, Bingbot text fetch,
+      Slack/LinkedIn unfurlers, curl): the <noscript> override re-displays it.
+      No inline <script> required, so this works under strict CSPs that
+      disallow 'unsafe-inline' script-src.
     -->
-    <script>
-      document.documentElement.classList.add('js');
-    </script>
     <style>
-      html.js #ssr-fallback { display: none !important; }
+      #ssr-fallback { display: none; }
     </style>
+    <noscript>
+      <style>
+        #ssr-fallback { display: block !important; }
+      </style>
+    </noscript>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
