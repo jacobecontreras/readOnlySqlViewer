@@ -2,12 +2,272 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Read Only SQL Viewer</title>
+
+    <title>ReadOnlySQL — Free Online SQLite Viewer, Runs in Your Browser</title>
+    <meta
+      name="description"
+      content="Free read-only SQLite viewer that runs entirely in your browser. Drop a .sqlite or .db file to explore tables, indexes, views, triggers, and run SELECT queries. Nothing is uploaded — your database never leaves your device."
+    />
+    <meta
+      name="keywords"
+      content="sqlite viewer, online sqlite, sqlite browser, open sqlite file, .sqlite online, .db viewer, sql browser, read only sql, sqlite web, sql.js"
+    />
+    <meta name="author" content="ReadOnlySQL" />
+    <meta name="application-name" content="ReadOnlySQL" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+    <meta name="googlebot" content="index,follow" />
+
+    <link rel="canonical" href="https://readonlysql.com/" />
+
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ReadOnlySQL" />
+    <meta property="og:title" content="ReadOnlySQL — Free Online SQLite Viewer" />
+    <meta
+      property="og:description"
+      content="Open .sqlite and .db files in your browser. Inspect schema, browse data, run read-only SQL. Nothing leaves your device."
+    />
+    <meta property="og:url" content="https://readonlysql.com/" />
+    <meta property="og:image" content="https://readonlysql.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="ReadOnlySQL — a browser-based SQLite viewer showing schema and query results."
+    />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ReadOnlySQL — Free Online SQLite Viewer" />
+    <meta
+      name="twitter:description"
+      content="Open .sqlite and .db files in your browser. Inspect schema, browse data, run read-only SQL. Nothing leaves your device."
+    />
+    <meta name="twitter:image" content="https://readonlysql.com/og-image.png" />
+    <meta
+      name="twitter:image:alt"
+      content="ReadOnlySQL — a browser-based SQLite viewer showing schema and query results."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://readonlysql.com/#org",
+            "name": "ReadOnlySQL",
+            "url": "https://readonlysql.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://readonlysql.com/icon-512.png",
+              "width": 512,
+              "height": 512
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://readonlysql.com/#website",
+            "url": "https://readonlysql.com/",
+            "name": "ReadOnlySQL",
+            "publisher": { "@id": "https://readonlysql.com/#org" },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://readonlysql.com/#app",
+            "name": "ReadOnlySQL",
+            "url": "https://readonlysql.com/",
+            "description": "Free read-only SQLite viewer that runs entirely in your browser. Open .sqlite or .db files, inspect tables and indexes, browse rows, and run SELECT queries without uploading anything.",
+            "applicationCategory": "DeveloperApplication",
+            "applicationSubCategory": "Database Tool",
+            "operatingSystem": "Any (modern web browser)",
+            "browserRequirements": "Requires a modern browser with WebAssembly support (Chrome, Edge, Firefox, Safari).",
+            "publisher": { "@id": "https://readonlysql.com/#org" },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "Open .sqlite and .db files locally in the browser",
+              "Read-only SQL execution (SELECT, WITH, EXPLAIN)",
+              "Schema inspection for tables, indexes, views, and triggers",
+              "Paginated data browser with sort and filter",
+              "Multi-tab SQL editor with timing and row counts",
+              "Up to 500 MB database files",
+              "Zero uploads — the file never leaves your device"
+            ],
+            "isAccessibleForFree": true,
+            "inLanguage": "en"
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": "https://readonlysql.com/#breadcrumbs",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "ReadOnlySQL",
+                "item": "https://readonlysql.com/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://readonlysql.com/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is my SQLite database uploaded to a server?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. ReadOnlySQL parses and queries your database entirely in your browser using a WebAssembly build of SQLite running in a Web Worker. The file never leaves your device."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What file types can I open?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Any SQLite database file, including .sqlite, .sqlite3, .db, and .db3. Files up to 500 MB are supported."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I modify the database?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. ReadOnlySQL only allows read-only queries (SELECT, WITH, EXPLAIN, and introspection PRAGMAs). Every query is wrapped in a SAVEPOINT/ROLLBACK to guarantee your file is never mutated."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do I need to install anything?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No installation is required. ReadOnlySQL runs in any modern browser with WebAssembly support."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is ReadOnlySQL free?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. ReadOnlySQL is free to use, with no account and no tracking."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!--
+        Pre-hydration static content. JS-enabled browsers never see this —
+        src/main.tsx clears #root before React mounts. AI crawlers and
+        other JS-less bots (GPTBot, ClaudeBot, PerplexityBot, Bingbot,
+        LinkedIn, Slack, etc.) see this HTML and can index the full
+        description, features, and FAQ.
+      -->
+      <div id="ssr-fallback" style="max-width: 64rem; margin: 0 auto; padding: 2.5rem 1.5rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #f2f2f2; background: #1a1a1a; line-height: 1.6;">
+        <header>
+          <p style="margin: 0 0 0.5rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #a3a3a3;">
+            100% local · nothing is uploaded
+          </p>
+          <h1 style="margin: 0 0 1rem; font-size: 2.25rem; line-height: 1.15; font-weight: 600;">
+            ReadOnlySQL — the free online SQLite viewer that runs in your browser
+          </h1>
+          <p style="margin: 0 0 1.5rem; font-size: 1.0625rem; color: #d0d0d0; max-width: 42rem;">
+            ReadOnlySQL opens <code>.sqlite</code>, <code>.sqlite3</code>,
+            <code>.db</code>, and <code>.db3</code> files right in your
+            browser. Inspect tables, indexes, views, and triggers, browse
+            rows with sort and filter, and run read-only SELECT queries —
+            without uploading your database anywhere.
+          </p>
+          <p style="margin: 0 0 2rem; color: #a3a3a3;">
+            Loading the interactive app…
+            <noscript>
+              This app requires JavaScript to run. Please enable JavaScript and reload the page.
+            </noscript>
+          </p>
+        </header>
+
+        <section>
+          <h2 style="font-size: 1.375rem; margin: 2rem 0 0.75rem;">Features</h2>
+          <ul style="margin: 0; padding-left: 1.25rem; color: #d0d0d0;">
+            <li><strong>Nothing is uploaded.</strong> Your SQLite file is parsed and queried entirely in your browser using WebAssembly. No server, no account, no tracking.</li>
+            <li><strong>Read-only by design.</strong> Only SELECT, WITH, EXPLAIN, and introspection PRAGMAs are allowed. Every query runs inside a SAVEPOINT/ROLLBACK so your file is never mutated.</li>
+            <li><strong>Full schema browser.</strong> Inspect tables, indexes, views, and triggers with their original SQL definitions. Filter schema objects instantly.</li>
+            <li><strong>Paginated data viewer.</strong> Browse rows with column sort, column resizing, and a global filter. Works smoothly on databases up to 500 MB.</li>
+            <li><strong>Multi-tab SQL editor.</strong> Run ad-hoc SELECT queries across multiple tabs, with inline timing and row/column counts on every execution.</li>
+            <li><strong>Instant and local.</strong> Powered by sql.js in a dedicated Web Worker. Queries run on your machine — no network round-trips.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.375rem; margin: 2rem 0 0.75rem;">How it works</h2>
+          <ol style="margin: 0; padding-left: 1.25rem; color: #d0d0d0;">
+            <li><strong>Drop or pick a file.</strong> Click Browse or drag a <code>.sqlite</code> or <code>.db</code> file onto the page. The file stays on your device.</li>
+            <li><strong>Explore schema and rows.</strong> Switch between Structure, Browse Data, and Execute SQL to inspect, filter, and query.</li>
+            <li><strong>Run read-only SQL.</strong> Use SELECT, WITH, or EXPLAIN. Destructive statements are rejected automatically.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2 style="font-size: 1.375rem; margin: 2rem 0 0.75rem;">Frequently asked questions</h2>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">Is my SQLite database uploaded to a server?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            No. ReadOnlySQL loads and queries your database entirely in the browser using a WebAssembly build of SQLite that runs inside a Web Worker. Your file never leaves your device.
+          </p>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">What file types can I open?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            Any SQLite database file, including <code>.sqlite</code>, <code>.sqlite3</code>, <code>.db</code>, and <code>.db3</code>. Files up to 500 MB are supported per session.
+          </p>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">Can I edit the database?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            No. ReadOnlySQL is a read-only SQLite viewer. Only SELECT, WITH, EXPLAIN, and a safe allowlist of introspection PRAGMAs are accepted. Destructive statements are rejected before execution.
+          </p>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">Do I need to install anything?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            No. ReadOnlySQL runs in any modern browser with WebAssembly support — Chrome, Edge, Firefox, or Safari. There is nothing to download or install.
+          </p>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">Is ReadOnlySQL free?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            Yes. ReadOnlySQL is free to use, with no account and no ads.
+          </p>
+
+          <h3 style="font-size: 1.0625rem; margin: 1.25rem 0 0.25rem;">How does it compare to DB Browser for SQLite?</h3>
+          <p style="margin: 0 0 0.75rem; color: #d0d0d0;">
+            DB Browser for SQLite is a full-featured desktop application that can modify databases. ReadOnlySQL is a browser-only, read-only viewer focused on fast schema inspection, safe SQL exploration, and zero-install access from any machine.
+          </p>
+        </section>
+
+        <footer style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #3a3a3a; color: #a3a3a3; font-size: 0.8125rem;">
+          <p style="margin: 0;">
+            ReadOnlySQL is built with React, Vite, and sql.js running inside a
+            Web Worker. Live at
+            <a href="https://readonlysql.com/" style="color: #e0e0e0;">readonlysql.com</a>.
+          </p>
+        </footer>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -370,6 +370,7 @@ export function BrowseDataPanel() {
                 : 'Load a SQLite database to browse data.'
           }
           highlightTerms={[deferredGlobalFilter]}
+          filterRowsByHighlight
           onSort={(column) => {
             goToPage(0)
             setSort((currentSort) => {

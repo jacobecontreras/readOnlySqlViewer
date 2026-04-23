@@ -4,6 +4,7 @@ import { BrowseDataPanel } from '@/components/database/browse-data-panel'
 import { ExecuteSqlPanel } from '@/components/database/execute-sql-panel'
 import { FileDropzone } from '@/components/database/file-dropzone'
 import { StructurePanel } from '@/components/database/structure-panel'
+import { LandingHero } from '@/components/landing-hero'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDbViewer } from '@/context/use-db-viewer'
@@ -25,6 +26,7 @@ function App() {
     databaseSummary,
     error,
     filePickerRequestKey,
+    hasDatabase,
     loadDatabase,
     requestFilePicker,
     selectedTable,
@@ -49,7 +51,10 @@ function App() {
       }}
     >
       <div className="flex h-full w-full flex-col overflow-hidden p-3 sm:p-4">
-        <section className="min-h-0 flex-1 overflow-hidden">
+        <section
+          aria-label={hasDatabase ? 'SQLite database viewer' : 'ReadOnlySQL'}
+          className="min-h-0 flex-1 overflow-hidden"
+        >
           <Tabs defaultValue="structure" className="h-full w-full">
             <div className="flex h-full min-h-0 flex-col overflow-hidden">
               <div className="flex flex-col gap-2 px-3 py-2 sm:px-4">
@@ -64,24 +69,29 @@ function App() {
                       onUnload={() => void unloadDatabase()}
                     />
                   </div>
-                  <div className="flex flex-wrap items-center justify-end gap-2">
-                    <div className="flex h-9 min-w-0 items-center px-1 text-sm text-muted-foreground">
-                      <span className="truncate font-medium text-foreground">
-                        {databaseSummary?.fileName ?? 'None'}
-                      </span>
+                  {hasDatabase ? (
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <div className="flex h-9 min-w-0 items-center px-1 text-sm text-muted-foreground">
+                        <span className="truncate font-medium text-foreground">
+                          {databaseSummary?.fileName ?? 'None'}
+                        </span>
+                      </div>
+                      <TabsList
+                        aria-label="Database panels"
+                        className="h-9 w-auto flex-nowrap rounded-xl border-border/70 bg-surface/95"
+                      >
+                        <TabsTrigger value="structure" className="min-w-[7rem] px-3">
+                          Structure
+                        </TabsTrigger>
+                        <TabsTrigger value="browse" className="min-w-[7rem] px-3">
+                          Browse Data
+                        </TabsTrigger>
+                        <TabsTrigger value="sql" className="min-w-[7rem] px-3">
+                          Execute SQL
+                        </TabsTrigger>
+                      </TabsList>
                     </div>
-                    <TabsList className="h-9 w-auto flex-nowrap rounded-xl border-border/70 bg-surface/95">
-                      <TabsTrigger value="structure" className="min-w-[7rem] px-3">
-                        Structure
-                      </TabsTrigger>
-                      <TabsTrigger value="browse" className="min-w-[7rem] px-3">
-                        Browse Data
-                      </TabsTrigger>
-                      <TabsTrigger value="sql" className="min-w-[7rem] px-3">
-                        Execute SQL
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
+                  ) : null}
                 </div>
 
                 {error ? (
@@ -108,17 +118,23 @@ function App() {
                 ) : null}
               </div>
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3">
-                <TabsContent value="structure" className="h-full">
-                  <StructurePanel />
-                </TabsContent>
-                <TabsContent value="browse" className="h-full">
-                  <BrowseDataPanel
-                    key={`${databaseRevision}:${selectedTable ?? ''}`}
-                  />
-                </TabsContent>
-                <TabsContent value="sql" className="h-full">
-                  <ExecuteSqlPanel key={databaseRevision} />
-                </TabsContent>
+                {hasDatabase ? (
+                  <>
+                    <TabsContent value="structure" className="h-full">
+                      <StructurePanel />
+                    </TabsContent>
+                    <TabsContent value="browse" className="h-full">
+                      <BrowseDataPanel
+                        key={`${databaseRevision}:${selectedTable ?? ''}`}
+                      />
+                    </TabsContent>
+                    <TabsContent value="sql" className="h-full">
+                      <ExecuteSqlPanel key={databaseRevision} />
+                    </TabsContent>
+                  </>
+                ) : (
+                  <LandingHero disabled={isBusy} onBrowse={requestFilePicker} />
+                )}
               </div>
             </div>
           </Tabs>

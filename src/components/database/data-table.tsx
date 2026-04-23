@@ -42,6 +42,8 @@ type DataTableProps = {
   }) => string | undefined
   getRowKey?: (row: DataTableCell[], rowIndex: number) => string
   highlightTerms?: string[]
+  /** When true, only rows where at least one cell's displayed text matches the highlight pattern are shown. */
+  filterRowsByHighlight?: boolean
   onRowClick?: (row: DataTableCell[], rowIndex: number) => void
   onSort?: (column: string) => void
   renderCell?: (props: {
@@ -141,6 +143,7 @@ export function DataTable({
   contentClassName,
   getRowKey,
   highlightTerms = [],
+  filterRowsByHighlight = false,
   onRowClick,
   onSort,
   renderCell,
@@ -164,28 +167,6 @@ export function DataTable({
   const tableRef = useRef<HTMLTableElement | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const overscan = 8
-  const shouldVirtualize = virtualizeRows && rows.length > VIRTUALIZATION_THRESHOLD
-  const { bottomSpacerHeight, visibleRows, visibleStartIndex } = useMemo(() => {
-    if (!shouldVirtualize) {
-      return {
-        bottomSpacerHeight: 0,
-        visibleRows: rows,
-        visibleStartIndex: 0,
-      }
-    }
-
-    const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan)
-    const visibleCount = Math.ceil(viewportHeight / rowHeight) + overscan * 2
-    const nextVisibleRows = rows.slice(startIndex, startIndex + visibleCount)
-    const remainingRows = Math.max(0, rows.length - (startIndex + nextVisibleRows.length))
-
-    return {
-      bottomSpacerHeight: remainingRows * rowHeight,
-      visibleRows: nextVisibleRows,
-      visibleStartIndex: startIndex,
-    }
-  }, [rowHeight, rows, scrollTop, shouldVirtualize, viewportHeight])
-  const topSpacerHeight = shouldVirtualize ? visibleStartIndex * rowHeight : 0
 
   // Memoize the highlight pattern to avoid rebuilding on every cell render
   const highlightPattern = useMemo(() => {
@@ -198,6 +179,50 @@ export function DataTable({
       'gi',
     )
   }, [highlightTerms])
+
+  const displayRows = useMemo(() => {
+    if (!filterRowsByHighlight || !highlightPattern) {
+      return rows
+    }
+    const matchFlags = highlightPattern.flags.replace(/g/g, '')
+    const rowTextMatches = (row: DataTableCell[]) => {
+      const matcher = new RegExp(highlightPattern.source, matchFlags)
+      return row.some((cell) => {
+        const text = isValidElement(cell)
+          ? String(cell)
+          : formatCellValue(toScalarCellValue(cell))
+        return text.search(matcher) !== -1
+      })
+    }
+    return rows.filter(rowTextMatches)
+  }, [filterRowsByHighlight, highlightPattern, rows])
+
+  const shouldVirtualize =
+    virtualizeRows && displayRows.length > VIRTUALIZATION_THRESHOLD
+  const { bottomSpacerHeight, visibleRows, visibleStartIndex } = useMemo(() => {
+    if (!shouldVirtualize) {
+      return {
+        bottomSpacerHeight: 0,
+        visibleRows: displayRows,
+        visibleStartIndex: 0,
+      }
+    }
+
+    const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan)
+    const visibleCount = Math.ceil(viewportHeight / rowHeight) + overscan * 2
+    const nextVisibleRows = displayRows.slice(startIndex, startIndex + visibleCount)
+    const remainingRows = Math.max(
+      0,
+      displayRows.length - (startIndex + nextVisibleRows.length),
+    )
+
+    return {
+      bottomSpacerHeight: remainingRows * rowHeight,
+      visibleRows: nextVisibleRows,
+      visibleStartIndex: startIndex,
+    }
+  }, [displayRows, rowHeight, scrollTop, shouldVirtualize, viewportHeight])
+  const topSpacerHeight = shouldVirtualize ? visibleStartIndex * rowHeight : 0
 
   // Measure actual row height from the DOM. ResizeObserver picks up font
   // swaps, zoom changes, and content reflows automatically; the document.fonts

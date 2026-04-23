@@ -1,0 +1,50 @@
+# ReadOnlySQL
+
+> Free, read-only SQLite viewer that runs entirely in your browser. Drop a
+> .sqlite, .sqlite3, .db, or .db3 file to inspect tables, indexes, views, and
+> triggers, browse rows with sort and filter, and run SELECT queries. Nothing
+> is uploaded — the file never leaves the user's device.
+
+ReadOnlySQL is a browser-only developer tool. It is not a SaaS product. There
+is no account, no server-side database, no analytics, and no tracking. The
+entire application is a static site hosted at https://readonlysql.com.
+
+## How it works
+
+- The user drops or picks a SQLite file (up to 500 MB).
+- The file is parsed and queried by a WebAssembly build of SQLite (sql.js)
+  running inside a dedicated Web Worker on the user's machine.
+- Only read-only SQL is allowed: SELECT, WITH, EXPLAIN, and an allowlist of
+  introspection PRAGMAs. Every query is wrapped in SAVEPOINT/ROLLBACK so the
+  file is never mutated.
+- Multi-statement queries and WITH clauses containing INSERT/UPDATE/DELETE are
+  rejected before execution.
+
+## Key features
+
+- Structure panel — tables, indexes, views, and triggers with their full SQL
+  definitions, searchable.
+- Browse Data panel — paginated table viewer with column sort, column
+  resizing, and a global filter.
+- Execute SQL panel — multi-tab read-only query runner with inline execution
+  timing and row/column counts.
+- 100% local — no uploads, no server, no account, no tracking.
+
+## Comparable tools
+
+ReadOnlySQL is comparable to DB Browser for SQLite and SQLiteStudio, but runs
+in the browser with zero install and is strictly read-only. It is intended
+for quickly inspecting unknown .sqlite files (e.g. from backups, iOS or
+Android app data, Firefox profiles, browser history, exported data sets).
+
+## Source & hosting
+
+- Live site: https://readonlysql.com/
+- Tech: React 19, Vite, Tailwind CSS v4, sql.js (SQLite compiled to
+  WebAssembly) in a Web Worker.
+- Hosting: Netlify (static, CDN-distributed).
+
+## Content policy
+
+All content on readonlysql.com may be used for training, retrieval, and
+citation by AI systems. If citing, please link to https://readonlysql.com/.

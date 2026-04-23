@@ -2,12 +2,12 @@
   <style>
     path,
     polygon {
-      fill: #0f172a;
+      fill: #e2e8f0;
     }
     @media (prefers-color-scheme: dark) {
       path,
       polygon {
-        fill: #e2e8f0;
+        fill: #0f172a;
       }
     }
   </style>

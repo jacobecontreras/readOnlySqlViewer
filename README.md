@@ -45,3 +45,80 @@ npm run preview    # serve the production build
 - Vite + Tailwind CSS v4
 - sql.js in a dedicated Web Worker (see `src/lib/sqlite-worker.ts`)
 - Radix Tabs + Slot for primitives; Lucide icons
+
+## SEO / hosting checklist
+
+The app ships SEO-ready for deployment at `https://readonlysql.com/`:
+
+- `index.html` — canonical URL, description, Open Graph, Twitter Card, JSON-LD
+  (`Organization` + `WebSite` + `WebApplication` + `BreadcrumbList` +
+  `FAQPage`), theme-color, manifest, and a full **static pre-hydration block**
+  (H1, features, how-it-works, FAQ) inside `#root` so AI crawlers that do not
+  execute JavaScript (GPTBot, ClaudeBot, PerplexityBot) still see the content.
+  `src/main.tsx` strips it before React mounts.
+- `src/components/landing-hero.tsx` — semantic `<h1>`, feature grid,
+  how-it-works, and FAQ rendered for real users when no database is loaded.
+- `public/robots.txt` — allow-list for Google, Bing, and all major AI
+  crawlers; points at the sitemap.
+- `public/sitemap.xml` — canonical URL list.
+- `public/llms.txt` — plain-text "about this site" file for AI answer
+  engines (emerging convention, cheap to maintain).
+- `public/site.webmanifest` — PWA metadata with separate `any` / `maskable`
+  icon purposes.
+- `public/og-image.png` — 1200×630 social share image.
+- `public/_headers` — Netlify cache, security, and CSP headers.
+
+If you change the canonical host, update it in:
+
+- `index.html` (`<link rel="canonical">`, `og:url`, `og:image`, `twitter:image`,
+  and the JSON-LD `url` / `@id` fields).
+- `public/robots.txt` (`Sitemap:` line).
+- `public/sitemap.xml` (`<loc>`).
+
+Host headers are configured in `public/_headers` for Netlify. The CSP uses
+`script-src 'self' 'wasm-unsafe-eval'` which is required for sql.js to compile
+its WebAssembly module without needing full `'unsafe-eval'`. If you migrate
+off Netlify, translate the rules to the equivalent `vercel.json` /
+`_redirects` / Cloudflare Pages format — all major hosts support the same
+directives.
+
+Post-deploy checklist:
+
+1. Run [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview)
+   on `https://readonlysql.com/` — expect ≥95 on SEO and Best Practices.
+2. Submit `https://readonlysql.com/sitemap.xml` in
+   [Google Search Console](https://search.google.com/search-console) and
+   [Bing Webmaster Tools](https://www.bing.com/webmasters).
+3. Validate structured data with the
+   [Rich Results Test](https://search.google.com/test/rich-results) — expect
+   `WebApplication` and `BreadcrumbList` to register. `FAQPage` is valid but
+   Google restricts its rich-result display to government and health sites
+   since August 2023; the markup still helps AI answer engines parse the
+   Q&A.
+4. Paste the URL into Slack / Twitter / LinkedIn / Facebook share debuggers
+   to confirm the OG card renders with `og-image.png`.
+5. Verify AI-crawler visibility with
+   `curl -A "GPTBot" https://readonlysql.com/ | grep -i readonlysql` —
+   you should see the H1, features, and FAQ text in the raw HTML.
+
+### PNG icons
+
+Generated from `public/favicon.svg` into a rounded, dark-bleed style that
+matches the app theme:
+
+- `public/apple-touch-icon.png` — 180×180, rounded corners, for iOS home screen.
+- `public/icon-192.png`, `public/icon-512.png` — `purpose: "any"` (rounded).
+- `public/icon-192-maskable.png`, `public/icon-512-maskable.png` — full-bleed
+  with the logo inside the ~70% safe zone, `purpose: "maskable"` for Android
+  adaptive icons.
+
+To regenerate (requires ImageMagick):
+
+```bash
+magick -background none -density 1536 public/favicon.svg -resize 512x512 public/icon-512.png
+magick -background none -density 1024 public/favicon.svg -resize 192x192 public/icon-192.png
+magick -background none -density 1024 public/favicon.svg -resize 180x180 public/apple-touch-icon.png
+```
+
+For the maskable variants, wrap `favicon.svg` in a full-bleed `<rect fill="#1a1a1a">`
+with the logo translated into the safe zone before rasterizing.
