@@ -2,47 +2,12 @@
 
 <p align="center">
   <a href="https://readonlysql.com"><img
-    src="https://img.shields.io/badge/live-readonlysql.com-0d9488?style=flat-square"
+    src="https://img.shields.io/badge/live-readonlysql.com-0366d6?style=flat-square"
     alt="Live site" /></a>
-  <a href="./LICENSE"><img
-    src="https://img.shields.io/badge/license-MIT-555555?style=flat-square"
+  <a href="https://github.com/jacobecontreras/readOnlySqlViewer/blob/main/LICENSE"><img
+    src="https://img.shields.io/github/license/jacobecontreras/readOnlySqlViewer?style=flat-square"
     alt="MIT License" /></a>
-  <img
-    src="https://img.shields.io/badge/React-19-20232a?style=flat-square&logo=react"
-    alt="React 19"
-  />
-  <img
-    src="https://img.shields.io/badge/TypeScript-6-3178c6?style=flat-square&logo=typescript&logoColor=white"
-    alt="TypeScript"
-  />
-  <img
-    src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white"
-    alt="Vite"
-  />
-  <img
-    src="https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white"
-    alt="Tailwind CSS"
-  />
 </p>
-
-<!--
-  Optional badges (uncomment and fill in ORG/REPO or paths):
-
-  GitHub Actions (after you add .github/workflows/ci.yml):
-  ![CI](https://github.com/ORG/REPO/actions/workflows/ci.yml/badge.svg)
-
-  Repo license (dynamic; needs public GitHub repo):
-  [![License](https://img.shields.io/github/license/ORG/REPO?style=flat-square)](./LICENSE)
-
-  Release / version from tags:
-  [![GitHub release](https://img.shields.io/github/v/release/ORG/REPO?style=flat-square)](https://github.com/ORG/REPO/releases)
-
-  npm (if you publish a package):
-  [![npm](https://img.shields.io/npm/v/PACKAGE_NAME?style=flat-square&logo=npm)](https://www.npmjs.com/package/PACKAGE_NAME)
-
-  PRs welcome (static):
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
--->
 
 <p align="center">
   <img
