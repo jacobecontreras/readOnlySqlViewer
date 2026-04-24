@@ -1,5 +1,3 @@
-> **Educational project**, in **very early stages** of development.
-
 <p align="center">
   <a href="https://readonlysql.com"><img
     src="https://img.shields.io/badge/live-readonlysql.com-0366d6?style=flat-square"
@@ -9,13 +7,7 @@
     alt="MIT License" /></a>
 </p>
 
-<p align="center">
-  <img
-    src="public/og-image.png"
-    alt="ReadOnlySQL — free online SQLite viewer in the browser. Read-only, WebAssembly, no upload."
-    width="720"
-  />
-</p>
+![readOnlySQLViewer banned](public/readme-banner.webp)
 
 Browser-only, read-only SQLite viewer. Drop a `.sqlite` or `.db` file to
 inspect schema, browse rows, and run read-only SQL. The file
@@ -65,18 +57,6 @@ is loaded in memory in a Web Worker via [sql.js](https://sql.js.org).
     alt="ReadOnlySQL: run SQL and view results."
     width="900" /></a>
 </p>
-
-## Development
-
-Requires Node 20+.
-
-```bash
-npm install
-npm run dev
-npm run build
-npm run lint
-npm run preview
-```
 
 ## Stack
 
